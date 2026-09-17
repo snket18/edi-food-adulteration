@@ -1,15 +1,20 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { StepIndicator } from '../components/features/StepIndicator';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Camera, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
+import { Camera, RefreshCw, AlertCircle, Sparkles, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/Alert';
 import { Badge } from '../components/ui/Badge';
+import { api } from '../services/api';
 
 export default function TestCapture() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const testId = location.state?.testId;
   const [isCaptured, setIsCaptured] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Developer override to deterministically select the scenario
   const [mockScenario, setMockScenario] = useState<'PURE' | 'WATER' | 'UREA' | 'STARCH' | undefined>();
@@ -21,6 +26,15 @@ export default function TestCapture() {
     { id: 'result', name: 'View Result' }
   ];
 
+  if (!testId) {
+    return (
+      <div className="p-8 text-center space-y-4">
+        <p className="text-destructive font-medium">Error: No active test session found.</p>
+        <Button onClick={() => navigate('/test')}>Return to Start</Button>
+      </div>
+    );
+  }
+
   const handleCapture = () => {
     setIsCaptured(true);
   };
@@ -29,9 +43,21 @@ export default function TestCapture() {
     setIsCaptured(false);
   };
 
-  const handleContinue = () => {
-    // Navigate to processing, passing the mock scenario through router state
-    navigate('/test/processing', { state: { mockScenario } });
+  const handleContinue = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await api.captureSpectrum(testId, { mockScenario });
+      if (res.data.success) {
+        navigate('/test/processing', { state: { testId } });
+      } else {
+        setError(res.data.message || 'Capture failed');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Network error during capture');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -42,6 +68,12 @@ export default function TestCapture() {
       </div>
 
       <StepIndicator steps={steps} currentStepIndex={1} />
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <CardHeader>
@@ -89,11 +121,12 @@ export default function TestCapture() {
               </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={handleRetake} size="lg" className="w-full sm:w-auto">
+                <Button variant="outline" onClick={handleRetake} size="lg" className="w-full sm:w-auto" disabled={isLoading}>
                   <RefreshCw className="mr-2 h-5 w-5" /> Retake
                 </Button>
-                <Button onClick={handleContinue} size="lg" className="w-full sm:w-auto">
-                  Process Image
+                <Button onClick={handleContinue} size="lg" className="w-full sm:w-auto" disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isLoading ? 'Processing...' : 'Process Image'}
                 </Button>
               </>
             )}

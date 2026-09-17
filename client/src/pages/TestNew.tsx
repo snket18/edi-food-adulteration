@@ -1,12 +1,16 @@
-
+import { useState } from 'react';
 import { StepIndicator } from '../components/features/StepIndicator';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from '../components/ui/Alert';
+import { Loader2 } from 'lucide-react';
+import { api } from '../services/api';
 
 export default function TestNew() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const steps = [
     { id: 'prep', name: 'Sample Preparation' },
@@ -14,6 +18,23 @@ export default function TestNew() {
     { id: 'process', name: 'AI Analysis' },
     { id: 'result', name: 'View Result' }
   ];
+
+  const handleStartTest = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await api.createTest({ sampleType: 'MILK' });
+      if (res.data.success) {
+        navigate('/test/capture', { state: { testId: res.data.data.id } });
+      } else {
+        setError(res.data.message || 'Failed to create test');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Network error while creating test');
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-8 max-w-3xl mx-auto">
@@ -23,6 +44,12 @@ export default function TestNew() {
       </div>
 
       <StepIndicator steps={steps} currentStepIndex={0} />
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <CardHeader>
@@ -75,8 +102,9 @@ export default function TestNew() {
           </div>
           
           <div className="flex justify-end pt-4">
-            <Button onClick={() => navigate('/test/capture')} size="lg">
-              Continue to Camera
+            <Button onClick={handleStartTest} size="lg" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading ? 'Creating Test...' : 'Continue to Camera'}
             </Button>
           </div>
         </CardContent>

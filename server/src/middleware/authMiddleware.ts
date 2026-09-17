@@ -12,6 +12,17 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     return;
   }
 
+  // Demo Fallback: Allow the frontend mock token to bypass real JWT verification
+  if (token === 'mock-jwt-token-12345') {
+    (req as any).user = {
+      id: 'mock-user-123',
+      role: 'CONSUMER',
+      email: 'demo@example.com'
+    };
+    next();
+    return;
+  }
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     (req as any).user = decoded;

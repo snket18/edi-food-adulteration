@@ -28,15 +28,15 @@ export const api = {
 
   health: () => apiClient.get('/health'),
   
-  // Simulated spectrum analysis endpoint
-  analyzeSpectrum: (_imageBlob: Blob, mockScenario?: string) => {
-    // In a real implementation, we'd send FormData containing the file
-    return apiClient.post('/tests/analyze', { mockScenario });
-  },
-
-  // Save finalized test result
-  saveTest: (data: { predictedClass: string; confidence: number; notes?: string }) => {
+  // Test Lifecycle
+  createTest: (data: { sampleType: string }) => {
     return apiClient.post('/tests', data);
+  },
+  captureSpectrum: (id: string, data?: { mockScenario?: string }) => {
+    return apiClient.post(`/tests/${id}/capture`, data || {});
+  },
+  analyzeTest: (id: string, data?: { mockScenario?: string }) => {
+    return apiClient.post(`/tests/${id}/analyze`, data || {});
   },
   
   // Fetch test history

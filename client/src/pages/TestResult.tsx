@@ -3,23 +3,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ResultCard } from '../components/features/ResultCard';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Alert, AlertDescription } from '../components/ui/Alert';
 import { Badge } from '../components/ui/Badge';
-import { api } from '../services/api';
-import { Save, RefreshCw, Loader2, AlertCircle, Sparkles, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, AlertCircle, Sparkles, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 import type { AdulterantType } from '../utils/types';
 
 export default function TestResult() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveComplete, setSaveComplete] = useState(false);
-  const [savedTestId, setSavedTestId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [warning, setWarning] = useState<string | null>(null);
   const [techDetailsOpen, setTechDetailsOpen] = useState(false);
 
   const prediction = location.state?.prediction;
+  const testId = location.state?.testId;
 
   // NO DATA state
   if (!prediction) {
@@ -33,39 +27,14 @@ export default function TestResult() {
     );
   }
 
-  const handleSaveResult = async () => {
-    if (saveComplete) return; // Prevent duplicate saves
-
-    setIsSaving(true);
-    setError(null);
-    setWarning(null);
-    
-    try {
-      const response = await api.saveTest({
-        predictedClass: prediction.class,
-        confidence: prediction.confidence
-      });
-      
-      if (response.data.success) {
-        setSaveComplete(true);
-        setSavedTestId(response.data.data.id);
-        if (response.data.warning) {
-          setWarning(response.data.warning);
-        }
-      }
-    } catch (err) {
-      setError('Failed to save the result. The database may be offline.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  // No save logic needed, the test is already saved in the database during Analysis.
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12 animate-in fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-2xl font-bold tracking-tight">Final Analysis Result</h2>
-        <Badge variant={prediction.class === 'PURE' ? 'success' : 'destructive'} className="w-fit text-sm">
-          {prediction.class}
+        <Badge variant={prediction.predictedClass === 'PURE' ? 'success' : 'destructive'} className="w-fit text-sm">
+          {prediction.predictedClass}
         </Badge>
       </div>
 
@@ -73,8 +42,8 @@ export default function TestResult() {
         {/* Main Result Area */}
         <div className="lg:col-span-2 space-y-6">
           <ResultCard 
-            predictionClass={prediction.class as AdulterantType} 
-            confidence={prediction.confidence} 
+            predictionClass={prediction.predictedClass as AdulterantType} 
+            confidence={prediction.confidenceScore} 
           />
 
           <Card>
@@ -141,7 +110,7 @@ export default function TestResult() {
             <CardContent className="pt-4 space-y-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Test ID</span>
-                <span className="font-medium">{savedTestId || 'Pending Save'}</span>
+                <span className="font-medium">{testId || 'Unknown'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Sample Type</span>
@@ -185,41 +154,18 @@ export default function TestResult() {
 
           {/* Action Area */}
           <div className="space-y-3 pt-4">
-            {error && (
-              <Alert variant="destructive" className="py-2">
-                <AlertDescription className="text-xs">{error}</AlertDescription>
-              </Alert>
-            )}
-            {warning && (
-              <Alert variant="warning" className="py-2">
-                <AlertDescription className="text-xs">{warning}</AlertDescription>
-              </Alert>
-            )}
-
-            {!saveComplete ? (
-              <Button 
-                onClick={handleSaveResult} 
-                disabled={isSaving} 
-                className="w-full gap-2 shadow-sm"
-                size="lg"
-              >
-                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                Save Result
-              </Button>
-            ) : (
-              <Button 
-                variant="outline"
-                disabled
-                className="w-full gap-2 opacity-100"
-                size="lg"
-              >
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                Result Saved
-              </Button>
-            )}
+            <Button 
+              variant="default"
+              disabled
+              className="w-full gap-2 opacity-100 shadow-sm"
+              size="lg"
+            >
+              <CheckCircle2 className="h-4 w-4 text-green-300" />
+              Result Saved Automatically
+            </Button>
 
             <Button 
-              variant={saveComplete ? "default" : "outline"}
+              variant="outline"
               onClick={() => navigate('/test')} 
               className="w-full gap-2 shadow-sm"
               size="lg"
@@ -231,7 +177,7 @@ export default function TestResult() {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <Button 
                 variant="ghost" 
-                onClick={() => navigate(savedTestId ? `/history/${savedTestId}` : '/history')} 
+                onClick={() => navigate(testId ? `/history/${testId}` : '/history')} 
                 className="w-full text-xs"
               >
                 View Test Details

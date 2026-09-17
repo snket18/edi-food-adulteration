@@ -27,11 +27,11 @@ export default function TestProcessing() {
   const [prediction, setPrediction] = useState<any>(null);
   const [viewMode, setViewMode] = useState<'original' | 'processed'>('original');
   
-  const mockScenario = location.state?.mockScenario;
+  const testId = location.state?.testId;
 
   // Protect route
-  if (mockScenario === undefined && !location.state) {
-    // Basic guard, real app would check if image blob exists
+  if (!testId) {
+    // Navigate back to start if accessed directly
   }
 
   const steps = [
@@ -42,7 +42,7 @@ export default function TestProcessing() {
   ];
 
   // Generate deterministic mock graph data for the demo
-  const graphData = useMemo(() => generateMockSpectrum(mockScenario), [mockScenario]);
+  const graphData = useMemo(() => generateMockSpectrum(prediction?.predictedClass), [prediction?.predictedClass]);
 
   useEffect(() => {
     let isMounted = true;
@@ -55,13 +55,12 @@ export default function TestProcessing() {
       });
     }, 400);
 
-    const performAnalysis = async () => {
+      const performAnalysis = async () => {
       try {
-        const dummyBlob = new Blob(['mock_image'], { type: 'image/jpeg' });
-        const response = await api.analyzeSpectrum(dummyBlob, mockScenario);
+        const response = await api.analyzeTest(testId);
         
         if (isMounted && response.data.success) {
-          setPrediction(response.data.data);
+          setPrediction(response.data.data.prediction);
           // Switch view mode to processed automatically halfway through
           setViewMode('processed'); 
         }
@@ -78,7 +77,7 @@ export default function TestProcessing() {
       isMounted = false;
       clearInterval(interval);
     };
-  }, [mockScenario]);
+  }, [testId]);
 
   const isComplete = currentStage === pipelineStages.length - 1 && prediction !== null;
 
@@ -203,15 +202,15 @@ export default function TestProcessing() {
                   </div>
                   <div className="flex justify-between pb-1">
                     <span className="text-muted-foreground">Prediction</span>
-                    <span className={`font-bold ${prediction.class === 'PURE' ? 'text-green-600' : 'text-destructive'}`}>
-                      {prediction.class}
+                    <span className={`font-bold ${prediction.predictedClass === 'PURE' ? 'text-green-600' : 'text-destructive'}`}>
+                      {prediction.predictedClass}
                     </span>
                   </div>
                 </div>
                 
                 <Button 
                   className="w-full gap-2 mt-4 shadow-sm"
-                  onClick={() => navigate('/test/result', { state: { prediction }, replace: true })}
+                  onClick={() => navigate('/test/result', { state: { prediction, testId }, replace: true })}
                 >
                   View Final Result <ChevronRight className="h-4 w-4" />
                 </Button>
