@@ -31,7 +31,8 @@ export default function TestNew() {
         setIsLoading(false);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Network error while creating test');
+      const currentUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+      setError(err.response?.data?.message || `Network error while creating test (Trying to hit: ${currentUrl})`);
       setIsLoading(false);
     }
   };
