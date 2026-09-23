@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Beaker, Droplets, AlertTriangle, Info } from 'lucide-react';
 

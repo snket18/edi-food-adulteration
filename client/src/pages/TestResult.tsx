@@ -4,7 +4,7 @@ import { ResultCard } from '../components/features/ResultCard';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { RefreshCw, AlertCircle, Sparkles, ChevronDown, ChevronUp, CheckCircle2, Download, Activity } from 'lucide-react';
+import { RefreshCw, AlertCircle, ChevronDown, ChevronUp, CheckCircle2, Download, Activity } from 'lucide-react';
 import type { AdulterantType } from '../utils/types';
 import { SpectrumChart } from '../components/features/SpectrumChart';
 import { generateMockSpectrum } from '../utils/mockData';
