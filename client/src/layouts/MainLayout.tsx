@@ -43,9 +43,15 @@ export default function MainLayout() {
           <ShieldCheck className="h-6 w-6" />
           SpectraCheck
         </div>
-        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 -mr-2 text-muted-foreground">
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="px-2 py-0.5 bg-amber-500/10 text-amber-600 border border-amber-500/20 rounded-full text-[10px] font-medium flex items-center gap-1">
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
+            Demo
+          </div>
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 -mr-2 text-muted-foreground">
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Sidebar Desktop & Mobile */}
@@ -106,9 +112,18 @@ export default function MainLayout() {
       <main className="flex-1 flex flex-col min-h-0 overflow-hidden w-full">
         {/* Desktop Header */}
         <header className="hidden md:flex items-center justify-between p-6 border-b bg-card/50 backdrop-blur-sm sticky top-0 z-30 no-print">
-          <h2 className="text-lg font-semibold text-foreground capitalize">
-            {location.pathname.split('/')[1] || 'Dashboard'}
-          </h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-lg font-semibold text-foreground capitalize">
+              {location.pathname.split('/')[1] || 'Dashboard'}
+            </h2>
+            <div className="px-3 py-1 bg-amber-500/10 text-amber-600 border border-amber-500/20 rounded-full text-xs font-medium flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+              Demo Mode: Data is Simulated
+            </div>
+          </div>
         </header>
         
         {/* Page Content */}

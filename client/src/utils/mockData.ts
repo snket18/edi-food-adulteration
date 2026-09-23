@@ -94,6 +94,61 @@ export const mockHistoryTests: TestResult[] = [
     location: { latitude: 18.5360, longitude: 73.8820 }, // Viman Nagar area
     status: 'COMPLETED',
   },
+  // --- New points across India ---
+  {
+    id: 'IND-MUM-01',
+    userId: 'user-2',
+    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    spectrumImageUrl: '/placeholder.jpg',
+    prediction: { predictedClass: 'WATER', confidenceScore: 0.91 },
+    location: { latitude: 19.0760, longitude: 72.8777 }, // Mumbai
+    status: 'COMPLETED',
+  },
+  {
+    id: 'IND-DEL-01',
+    userId: 'user-3',
+    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    spectrumImageUrl: '/placeholder.jpg',
+    prediction: { predictedClass: 'PURE', confidenceScore: 0.99 },
+    location: { latitude: 28.7041, longitude: 77.1025 }, // Delhi
+    status: 'COMPLETED',
+  },
+  {
+    id: 'IND-BLR-01',
+    userId: 'user-4',
+    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    spectrumImageUrl: '/placeholder.jpg',
+    prediction: { predictedClass: 'UREA', confidenceScore: 0.89 },
+    location: { latitude: 12.9716, longitude: 77.5946 }, // Bangalore
+    status: 'COMPLETED',
+  },
+  {
+    id: 'IND-KOL-01',
+    userId: 'user-5',
+    timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    spectrumImageUrl: '/placeholder.jpg',
+    prediction: { predictedClass: 'STARCH', confidenceScore: 0.92 },
+    location: { latitude: 22.5726, longitude: 88.3639 }, // Kolkata
+    status: 'COMPLETED',
+  },
+  {
+    id: 'IND-CHN-01',
+    userId: 'user-6',
+    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    spectrumImageUrl: '/placeholder.jpg',
+    prediction: { predictedClass: 'PURE', confidenceScore: 0.96 },
+    location: { latitude: 13.0827, longitude: 80.2707 }, // Chennai
+    status: 'COMPLETED',
+  },
+  {
+    id: 'IND-HYD-01',
+    userId: 'user-7',
+    timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    spectrumImageUrl: '/placeholder.jpg',
+    prediction: { predictedClass: 'WATER', confidenceScore: 0.94 },
+    location: { latitude: 17.3850, longitude: 78.4867 }, // Hyderabad
+    status: 'COMPLETED',
+  }
 ];
 
 // Helper to generate a realistic-looking mock spectral graph

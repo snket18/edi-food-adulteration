@@ -61,7 +61,7 @@ function MapUpdater({ center, zoom }: { center: [number, number], zoom: number }
   return null;
 }
 
-export function GeographicMap({ data, center = [18.5204, 73.8567], zoom = 12, onSelectTest }: GeographicMapProps) {
+export function GeographicMap({ data, center = [22.5937, 78.9629], zoom = 4.5, onSelectTest }: GeographicMapProps) {
   const navigate = useNavigate();
 
   return (

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { ErrorState, LoadingSpinner } from '../components/ui/StateContainers';
-import { ArrowLeft, MapPin, ChevronDown, ChevronUp, Activity, FileTerminal } from 'lucide-react';
+import { ArrowLeft, MapPin, ChevronDown, ChevronUp, Activity, FileTerminal, Download } from 'lucide-react';
 import { api } from '../services/api';
 import { mockHistoryTests, generateMockSpectrum } from '../utils/mockData';
 import type { TestResult, AdulterantType } from '../utils/types';
@@ -103,13 +103,13 @@ export default function TestDetail() {
             />
           )}
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 border-b">
+          <Card className="card-print">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 border-b bg-muted/20">
               <div>
                 <CardTitle className="text-lg">Spectrum Analysis</CardTitle>
                 <p className="text-sm text-muted-foreground">Historical spectral capture</p>
               </div>
-              <div className="flex bg-muted p-1 rounded-md">
+              <div className="flex bg-muted p-1 rounded-md no-print">
                 <button
                   className={`px-3 py-1 text-sm rounded-sm font-medium transition-colors ${viewMode === 'original' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                   onClick={() => setViewMode('original')}
@@ -190,9 +190,20 @@ export default function TestDetail() {
             )}
           </Card>
 
-          <Button className="w-full" onClick={() => navigate('/test')}>
-            Test Another Sample
-          </Button>
+          <div className="space-y-3 pt-4 no-print">
+            <Button 
+              variant="secondary"
+              onClick={() => window.print()}
+              className="w-full gap-2 shadow-sm"
+              size="lg"
+            >
+              <Download className="h-4 w-4" />
+              Download PDF Report
+            </Button>
+            <Button className="w-full" onClick={() => navigate('/test')}>
+              Test Another Sample
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,19 +1,27 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ResultCard } from '../components/features/ResultCard';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { RefreshCw, AlertCircle, Sparkles, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, AlertCircle, Sparkles, ChevronDown, ChevronUp, CheckCircle2, Download, Activity } from 'lucide-react';
 import type { AdulterantType } from '../utils/types';
+import { SpectrumChart } from '../components/features/SpectrumChart';
+import { generateMockSpectrum } from '../utils/mockData';
 
 export default function TestResult() {
   const location = useLocation();
   const navigate = useNavigate();
   const [techDetailsOpen, setTechDetailsOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'original' | 'processed'>('processed');
 
   const prediction = location.state?.prediction;
   const testId = location.state?.testId;
+
+  const graphData = useMemo(() => {
+    if (!prediction) return [];
+    return generateMockSpectrum(prediction.predictedClass as AdulterantType);
+  }, [prediction]);
 
   // NO DATA state
   if (!prediction) {
@@ -139,21 +147,37 @@ export default function TestResult() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="border-b bg-muted/20">
-              <CardTitle className="text-lg">Spectrum Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4 space-y-4">
-              <div className="aspect-video bg-gradient-to-r from-purple-900 via-indigo-800 to-blue-900 rounded-md flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 opacity-30 mix-blend-overlay bg-[url('/noise.png')]"></div>
-                <Sparkles className="h-6 w-6 text-white/50" />
+          <Card className="card-print">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 border-b bg-muted/20">
+              <div>
+                <CardTitle className="text-lg">Spectrum Summary</CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">Simulated spectral analysis</p>
               </div>
-              <p className="text-xs text-center text-muted-foreground">Simulated Spectral Capture</p>
+              <div className="flex bg-muted p-1 rounded-md no-print">
+                <button
+                  className={`px-2 py-1 text-xs rounded-sm font-medium transition-colors ${viewMode === 'original' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                  onClick={() => setViewMode('original')}
+                >
+                  Original
+                </button>
+                <button
+                  className={`px-2 py-1 text-xs rounded-sm font-medium transition-colors ${viewMode === 'processed' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                  onClick={() => setViewMode('processed')}
+                >
+                  Processed
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <SpectrumChart data={graphData} viewMode={viewMode} />
+              <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground border-t pt-4">
+                <span className="flex items-center gap-1"><Activity className="h-3 w-3"/> Reconstructed Demo Spectrum</span>
+              </div>
             </CardContent>
           </Card>
 
           {/* Action Area */}
-          <div className="space-y-3 pt-4">
+          <div className="space-y-3 pt-4 no-print">
             <Button 
               variant="default"
               disabled
@@ -162,6 +186,16 @@ export default function TestResult() {
             >
               <CheckCircle2 className="h-4 w-4 text-green-300" />
               Result Saved Automatically
+            </Button>
+            
+            <Button 
+              variant="secondary"
+              onClick={() => window.print()}
+              className="w-full gap-2 shadow-sm"
+              size="lg"
+            >
+              <Download className="h-4 w-4" />
+              Download PDF Report
             </Button>
 
             <Button 
