@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ResultCard } from '../components/features/ResultCard';
 import { SpectrumChart } from '../components/features/SpectrumChart';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
@@ -14,6 +14,7 @@ import type { TestResult, AdulterantType } from '../utils/types';
 export default function TestDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [test, setTest] = useState<TestResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,13 @@ export default function TestDetail() {
     
     const fetchTest = async () => {
       if (!id) return;
+      
+      // If we received a mock test from the previous screen, use it directly (important for Demo Mode when DB is down)
+      if (location.state?.mockTest) {
+        setTest(location.state.mockTest);
+        setIsLoading(false);
+        return;
+      }
       
       try {
         setIsLoading(true);
@@ -193,7 +201,13 @@ export default function TestDetail() {
           <div className="space-y-3 pt-4 no-print">
             <Button 
               variant="secondary"
-              onClick={() => window.print()}
+              onClick={() => {
+                if (typeof window !== 'undefined' && (window as any).Capacitor?.isNativePlatform?.()) {
+                  alert("PDF downloading is not supported inside the native app yet. Please use the Web Dashboard to download reports.");
+                } else {
+                  window.print();
+                }
+              }}
               className="w-full gap-2 shadow-sm"
               size="lg"
             >

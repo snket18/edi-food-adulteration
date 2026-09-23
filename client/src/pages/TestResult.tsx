@@ -4,7 +4,7 @@ import { ResultCard } from '../components/features/ResultCard';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { RefreshCw, AlertCircle, ChevronDown, ChevronUp, CheckCircle2, Download, Activity } from 'lucide-react';
+import { RefreshCw, AlertCircle, ChevronDown, ChevronUp, CheckCircle2, Download, Activity, ArrowLeft } from 'lucide-react';
 import type { AdulterantType } from '../utils/types';
 import { SpectrumChart } from '../components/features/SpectrumChart';
 import { generateMockSpectrum } from '../utils/mockData';
@@ -40,7 +40,12 @@ export default function TestResult() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12 animate-in fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold tracking-tight">Final Analysis Result</h2>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/test')} className="shrink-0 -ml-2 sm:hidden">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="text-2xl font-bold tracking-tight">Final Analysis Result</h2>
+        </div>
         <Badge variant={prediction.predictedClass === 'PURE' ? 'success' : 'destructive'} className="w-fit text-sm">
           {prediction.predictedClass}
         </Badge>
@@ -190,7 +195,13 @@ export default function TestResult() {
             
             <Button 
               variant="secondary"
-              onClick={() => window.print()}
+              onClick={() => {
+                if (typeof window !== 'undefined' && (window as any).Capacitor?.isNativePlatform?.()) {
+                  alert("PDF downloading is not supported inside the native app yet. Please use the Web Dashboard to download reports.");
+                } else {
+                  window.print();
+                }
+              }}
               className="w-full gap-2 shadow-sm"
               size="lg"
             >
@@ -211,7 +222,16 @@ export default function TestResult() {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <Button 
                 variant="ghost" 
-                onClick={() => navigate(testId ? `/history/${testId}` : '/history')} 
+                onClick={() => navigate(testId ? `/history/${testId}` : '/history', {
+                  state: {
+                    mockTest: {
+                      id: testId || 'Demo-Test',
+                      prediction,
+                      status: 'COMPLETED',
+                      timestamp: new Date().toISOString()
+                    }
+                  }
+                })} 
                 className="w-full text-xs"
               >
                 View Test Details
